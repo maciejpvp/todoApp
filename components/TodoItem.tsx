@@ -6,6 +6,7 @@ import {
 } from "@/actions/todo";
 import { Checkbox } from "@heroui/checkbox";
 import { DeleteButton } from "./DeleteButton";
+import { useOptimistic, useTransition } from "react";
 
 type ToDoItemProps = {
   id: number;
@@ -14,11 +15,26 @@ type ToDoItemProps = {
 };
 
 export const TodoItem = ({ id, content, active }: ToDoItemProps) => {
+  // eslint-disable-next-line
+  const [_, startTransition] = useTransition();
+  const [optimisticActive, setOptimisticActive] = useOptimistic(active);
+
+  const handleCheckboxChange = (newState: boolean) => {
+    startTransition(async () => {
+      setOptimisticActive(newState);
+      try {
+        await changeTodoState(id, newState);
+      } catch {
+        setOptimisticActive(active);
+      }
+    });
+  };
+
   return (
     <div className="flex flex-row items-center justify-center group">
       <Checkbox
-        isSelected={active}
-        onValueChange={(newState) => changeTodoState(id, newState)}
+        isSelected={optimisticActive}
+        onValueChange={handleCheckboxChange}
       ></Checkbox>
       <div className="flex flex-row items-center justify-center gap-1 ">
         <input
@@ -29,7 +45,7 @@ export const TodoItem = ({ id, content, active }: ToDoItemProps) => {
         />
         <button
           onClick={() => deleteNewTodoItem(id)}
-          className="opacity-0 group-hover:opacity-100 transition-all duration-150"
+          className="opacity-0 group-hover:opacity-100 transition-all duration-10"
         >
           <DeleteButton />
         </button>

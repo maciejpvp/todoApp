@@ -8,7 +8,7 @@ import {
 import { revalidatePath } from "next/cache";
 
 export const changeTodoState = async (id: number, newState: boolean) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  // await new Promise((resolve) => setTimeout(resolve, 1000));
 
   dbChangeTodoState(id, newState ? 1 : 0);
   revalidatePath("/dashboard");
