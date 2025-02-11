@@ -1,4 +1,4 @@
-import { addNewTodoItem } from "@/actions/todo";
+import { addNewTodoItem } from "@/actions/todo-actions";
 import { TodoItem } from "@/components/TodoItem";
 import { getTodoContentById, TodoContent } from "@/lib/todos";
 

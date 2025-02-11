@@ -13,8 +13,10 @@
     "@heroui/checkbox": "^2.3.9",
     "@heroui/system": "^2.4.7",
     "@heroui/theme": "^2.4.6",
+    "@lucia-auth/adapter-sqlite": "^3.0.2",
     "better-sqlite3": "^11.8.1",
     "framer-motion": "^12.4.1",
+    "lucia": "^3.2.2",
     "next": "15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

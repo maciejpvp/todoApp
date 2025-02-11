@@ -3,10 +3,10 @@ import {
   changeTodoContent,
   changeTodoState,
   deleteNewTodoItem,
-} from "@/actions/todo";
+} from "@/actions/todo-actions";
 import { Checkbox } from "@heroui/checkbox";
 import { DeleteButton } from "./DeleteButton";
-import { useOptimistic, useTransition } from "react";
+import { useOptimistic, useRef, useTransition } from "react";
 
 type ToDoItemProps = {
   id: number;
@@ -18,6 +18,7 @@ export const TodoItem = ({ id, content, active }: ToDoItemProps) => {
   // eslint-disable-next-line
   const [_, startTransition] = useTransition();
   const [optimisticActive, setOptimisticActive] = useOptimistic(active);
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const handleCheckboxChange = (newState: boolean) => {
     startTransition(async () => {
@@ -30,6 +31,16 @@ export const TodoItem = ({ id, content, active }: ToDoItemProps) => {
     });
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
+    debounceTimeout.current = setTimeout(() => {
+      changeTodoContent(id, e.target.value);
+    }, 500);
+  };
+
   return (
     <div className="flex flex-row items-center justify-center group">
       <Checkbox
@@ -40,7 +51,7 @@ export const TodoItem = ({ id, content, active }: ToDoItemProps) => {
         <input
           type="text"
           defaultValue={content}
-          onChange={(e) => changeTodoContent(id, e.target.value)}
+          onChange={(e) => handleInputChange(e)}
           className="bg-stone-900 outline-none"
         />
         <button

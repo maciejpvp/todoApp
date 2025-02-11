@@ -1,5 +1,4 @@
-import sql from "better-sqlite3";
-const db = sql("todo.db");
+import db from "./db";
 
 export type Todo = {
   id: number;
@@ -16,7 +15,9 @@ export type TodoContent = {
 };
 
 export const getTodosForUser = (): Todo[] => {
-  const todos = db.prepare(`SELECT * FROM todos`).all() as Todo[];
+  const todos = db
+    .prepare(`SELECT * FROM todos WHERE creator_id=?`)
+    .all("1") as Todo[];
   return todos;
 };
 
