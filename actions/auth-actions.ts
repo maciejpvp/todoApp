@@ -6,21 +6,28 @@ import { createUser, getUserByEmail } from "@/lib/users";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-export const signUp = async (formData: FormData) => {
+type AuthResult = {
+  email?: string;
+  password?: string;
+};
+
+export const signUp = async (
+  _: unknown,
+  formData: FormData
+): Promise<AuthResult> => {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-
-  if (!emailRegex.test(email)) {
-    console.error("Invalid email format");
+  if (!email) {
+    return {
+      email: "Email is Required",
+    };
   }
 
-  if (!passwordRegex.test(password)) {
-    console.error(
-      "Password must be at least 8 characters long and contain at least one letter and one number"
-    );
+  if (!password) {
+    return {
+      password: "Password is Required",
+    };
   }
 
   const hashedPassword = hashUserPassword(password);
@@ -33,18 +40,31 @@ export const signUp = async (formData: FormData) => {
     sessionCookie.value,
     sessionCookie.attributes
   );
+  redirect("/dashboard");
 };
 
-export const login = async (formData: FormData) => {
+export const login = async (
+  _: unknown,
+  formData: FormData
+): Promise<AuthResult> => {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-  if (!email) return;
+
+  if (!email)
+    return {
+      email: "Email is required",
+    };
 
   const user = getUserByEmail(email);
-  if (!user) return;
+  if (!user)
+    return {
+      email: "Email or password is invalid",
+    };
   const isPasswordValid = verifyPassword(user.password, password);
   if (!isPasswordValid) {
-    return;
+    return {
+      email: "Email or password is invalid",
+    };
   }
   const sessionCookie = await createAuthSession(`${user.id}`);
   const cookiesStore = await cookies();
@@ -59,4 +79,13 @@ export const login = async (formData: FormData) => {
 export const logout = async () => {
   await destroySession();
   redirect("/");
+};
+
+export const auth = async (mode: string, _: unknown, formData: FormData) => {
+  if (mode === "login") {
+    return login(_, formData);
+  }
+  if (mode === "signup") {
+    return signUp(_, formData);
+  }
 };

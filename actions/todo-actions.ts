@@ -4,6 +4,9 @@ import {
   changeTodoContent as dbChangeTodoContent,
   createNewTodoItem as dbCreateNewTodoItem,
   deleteTodoItem as dbDeleteTodoItem,
+  createTodoList as dbCreateTodoList,
+  deleteTodoList as dbDeleteTodoList,
+  changeTodoListName as dbChangeTodoListName,
 } from "@/lib/todos";
 import { revalidatePath } from "next/cache";
 
@@ -26,4 +29,18 @@ export const addNewTodoItem = async (id: number) => {
 export const deleteNewTodoItem = async (id: number) => {
   dbDeleteTodoItem(id);
   revalidatePath("/dashboard");
+};
+
+export const createTodoList = async () => {
+  dbCreateTodoList();
+  revalidatePath("/dashboard");
+};
+
+export const deleteTodoList = async (todoId: string) => {
+  dbDeleteTodoList(todoId);
+  revalidatePath("/dashboard");
+};
+
+export const changeTodoListName = async (id: number, newContent: string) => {
+  dbChangeTodoListName(id, newContent);
 };

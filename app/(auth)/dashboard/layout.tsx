@@ -1,5 +1,5 @@
 import { logout } from "@/actions/auth-actions";
-import { verifyAuth } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 export default async function DashboardLayout({
@@ -9,11 +9,10 @@ export default async function DashboardLayout({
   sidebar: React.ReactNode;
   editor: React.ReactNode;
 }) {
-  const loginResult = await verifyAuth();
+  const loginResult = await getCurrentUser();
   if (!loginResult.user) {
     return redirect("/auth");
   }
-  console.log(loginResult);
   return (
     <div className="flex h-screen">
       <form action={logout}>

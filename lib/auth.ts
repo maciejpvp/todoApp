@@ -16,7 +16,7 @@ import { cookies } from "next/headers";
 //   };
 // };
 
-export type VerifyAuthResult = {
+export type getCurrentUserResult = {
   user: {
     id: string;
   } | null;
@@ -45,11 +45,10 @@ const lucia = new Lucia(adapter, {
 export const createAuthSession = async (userId: string): Promise<Cookie> => {
   const session = await lucia.createSession(userId, {});
   const sessionCookie = lucia.createSessionCookie(session.id);
-  console.log("123", sessionCookie);
   return sessionCookie;
 };
 
-export const verifyAuth = async (): Promise<VerifyAuthResult> => {
+export const getCurrentUser = async (): Promise<getCurrentUserResult> => {
   const sessionCookie = (await cookies()).get(lucia.sessionCookieName);
 
   if (!sessionCookie) {
@@ -87,12 +86,11 @@ export const verifyAuth = async (): Promise<VerifyAuthResult> => {
   } catch (error) {
     console.error("Error verifying auth session:", error);
   }
-  console.log(result);
   return result;
 };
 
 export const destroySession = async (): Promise<{ error?: string }> => {
-  const { session } = await verifyAuth();
+  const { session } = await getCurrentUser();
   if (!session) {
     return {
       error: "Unauthorized",
